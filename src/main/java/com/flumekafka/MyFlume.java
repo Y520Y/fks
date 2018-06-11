@@ -23,10 +23,11 @@ public class MyFlume  extends AbstractSink implements Configurable{
     public void configure(Context context) {
         Map<String,String> map = context.getParameters();
         Iterator iter = map.entrySet().iterator();
-        //可以获取flume配置中的属性，配置文件中 producer.sinks.r.metadata.broker.list=ip1:9092,ip2:9092,ip3:9092
+        //可以获取flume配置中的属性，配置文件中 producer.sinks.r.metadata.broker.list=ip1:9092,ip2:9092,ip3:9092(kafka-port)
         String  metadataBrokerList = map.get("metadata.broker.list");
         Properties p = new Properties();
-        p.setProperty("bootstrap.servers","192.168.10.150:9092,192.168.10.151:9092");
+//        p.setProperty("bootstrap.servers","192.168.10.150:9092,192.168.10.151:9092");
+        p.setProperty("bootstrap.servers",metadataBrokerList);
         p.setProperty("key.serializer","org.apache.kafka.common.serialization.StringSerializer");
         p.setProperty("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
         p.setProperty("request.required.acks","1");
