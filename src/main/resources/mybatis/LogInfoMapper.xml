@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LogInfoDao">
+
+	<select id="getColumn" resultType="map">
+		select COLUMN_NAME,DATA_TYPE from USER_TAB_COLUMNS WHERE TABLE_NAME=#{tablename} and  COLUMN_NAME !='ID'
+	</select>
+
+	<insert id="save">
+		insert into ${tablename}
+		select * from
+		<foreach collection="data" item="d" open="(" close=")" separator="union all">
+			select sys_guid(),
+			<foreach collection="d" index="k" item="c" separator=",">
+				#{c.value,jdbcType=${c.type}} as ${k}
+			</foreach>
+			from dual
+		</foreach>
+	</insert>
+
+</mapper>

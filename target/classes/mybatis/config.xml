@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- MyBatis全局配置 -->
+    <settings>
+        <!-- 禁用MyBatis自己的缓存，在业务方法上使用Spring的Cache注解 -->
+        <setting name="cacheEnabled" value="false"/>
+    </settings>
+
+</configuration>

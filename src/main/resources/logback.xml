@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <contextName>fks</contextName>
+
+    <!-- 定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
+    <property name="LOG_HOME" value="/home/boco/logs" />
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度,%msg：日志消息，%n是换行符-->
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 时间滚动输出 level为 DEBUG 日志 -->
+    <appender name="file-debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/fks/debug/catalina.log</file>
+        <!-- 限制输出级别 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!-- 时间和文件大小滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/fks/debug/catalina.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!-- 日志文件保留天数(如果时间格式是yyyy-MM,则保留时间单位为月,以此类推) -->
+            <MaxHistory>30</MaxHistory>
+            <!-- 日志文件超过此大小进行分割 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 总日志文件大小限制,当超过了总大小上限时，将异步删除最老的文件。 -->
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 时间滚动输出 level为 INFO 日志 -->
+    <appender name="file-info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/fks/info/catalina.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/fks/info/catalina.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 时间滚动输出 level为 ERROR 日志 -->
+    <appender name="file-error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/fks/error/catalina.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/fks/error/catalina.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 设定某些特定的包的日志等级 -->
+    <logger name="com.apache.ibatis" level="DEBUG"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+    <logger name="com.dao" level="DEBUG"/>
+
+    <!-- 根logger,指定项目默认的日志输出等级 -->
+    <root level="DEBUG">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file-debug"/>
+        <appender-ref ref="file-info"/>
+        <appender-ref ref="file-error"/>
+    </root>
+</configuration>

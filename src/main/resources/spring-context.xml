@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <description>Spring公共配置</description>
+
+    <!-- 使用annotation自动注册bean,但去掉Controller,把它交给springMVC注册 -->
+    <context:component-scan base-package="com" use-default-filters="true">
+    </context:component-scan>
+
+    <!-- 开启定时任务 -->
+    <task:annotation-driven/>
+
+    <!-- 启动对@AspectJ注解的支持 -->
+    <!-- proxy-target-class等于true是强制使用cglib代理，proxy-target-class默认是false，如果你的类实现了接口 就走JDK代理，如果没有，走cglib代理  -->
+    <!-- 注：对于单利模式建议使用cglib代理，虽然JDK动态代理比cglib代理速度快，但性能不如cglib -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- MyBatis配置 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 自动扫描entity目录,省掉Configuration.xml里的手工配置,多个路径用分号隔开 -->
+        <property name="typeAliasesPackage" value="com.boco.interfaces.entity"/>
+        <!-- 显式指定Mapper文件位置 -->
+        <property name="mapperLocations" value="classpath*:/mybatis/*Mapper.xml"/>
+        <property name="configLocation" value="classpath:/mybatis/config.xml"/>
+    </bean>
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+        <constructor-arg index="1" value="BATCH"/>
+    </bean>
+    <!-- 扫描basePackage接口 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.dao"/>
+    </bean>
+
+    <!-- 使用annotation定义事务 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+    <!-- 参数配置文件 -->
+    <context:property-placeholder ignore-unresolvable="true" file-encoding="utf-8"
+                                  location="classpath:config.properties,classpath:jdbc.properties"/>
+
+    <!-- 数据源配置, 使用TomcatJDBC连接池(tomcat7以后支持) -->
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+          destroy-method="close">
+        <!-- Connection Info -->
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <!-- Connection Pooling Info -->
+        <property name="url" value="jdbc:oracle:thin:@192.168.10.240:1521:dbzhzs"/>
+        <property name="username" value="investment_test"/>
+        <property name="password" value="investment_test"/>
+        <property name="initialSize" value="${jdbc.pool.initialSize}"/>
+        <property name="maxActive" value="${jdbc.pool.maxActive}"/>
+        <property name="maxIdle" value="${jdbc.pool.maxIdle}"/>
+        <property name="minIdle" value="${jdbc.pool.minIdle}"/>
+        <property name="defaultAutoCommit" value="${jdbc.pool.defaultAutoCommit}"/>
+        <property name="maxWait" value="${jdbc.pool.maxWait}"/>
+        <property name="validationQuery" value="${jdbc.pool.validationQuery}"/>
+        <property name="testOnBorrow" value="${jdbc.pool.testOnBorrow}"/>
+        <property name="testOnReturn" value="${jdbc.pool.testOnReturn}"/>
+        <property name="testWhileIdle" value="${jdbc.pool.testWhileIdle}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.pool.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.pool.minEvictableIdleTimeMillis}"/>
+        <property name="removeAbandoned" value="${jdbc.pool.removeAbandoned}"/>
+        <property name="removeAbandonedTimeout" value="${jdbc.pool.removeAbandonedTimeout}"/>
+        <property name="logAbandoned" value="${jdbc.pool.logAbandoned}"/>
+    </bean>
+
+</beans>
